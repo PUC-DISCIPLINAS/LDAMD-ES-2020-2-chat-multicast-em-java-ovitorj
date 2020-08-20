@@ -6,86 +6,96 @@ import java.util.Scanner;
 
 public class ChatMulticast {
 
-	static String nome;
-	static boolean fim = false;
-	static String ipGrupo = "224.255.255.255";
-	static int porta = 6789;
+  static String nome;
+  static boolean fim = false;
+  static String ipGrupo = "224.255.255.255";
+  static int porta = 6789;
 
-	static Scanner in = new Scanner(System.in);
+  static Scanner in = new Scanner(System.in);
 
-	public static void adicionarUsuario() throws IOException {
+  public static void adicionarUsuario() throws IOException {
 
-		System.out.println("Digite seu nome:");
-		nome = in.nextLine();
-		InetAddress groupIp = InetAddress.getByName(ipGrupo);
+    System.out.println("Digite seu nome:");
+    nome = in.nextLine();
+    InetAddress groupIp = InetAddress.getByName(ipGrupo);
 
-		MulticastSocket mSocket = new MulticastSocket(porta);
-		mSocket.setTimeToLive(0);
-		mSocket.joinGroup(groupIp);
-		Thread th = new Thread(new ExecutaThread(mSocket, groupIp, porta));
-		th.start();
+    MulticastSocket mSocket = new MulticastSocket(porta);
+    mSocket.setTimeToLive(0);
+    mSocket.joinGroup(groupIp);
+    Thread th = new Thread(new ExecutaThread(mSocket, groupIp, porta));
+    th.start();
 
     System.out.println();
-		System.out.println("Ola " + nome );
-    System.out.println("Bem vindo ao chat Multicast");
-    System.out.println("Para deixar o chat digite 'sair' ");
-     System.out.println();
-    System.out.println("Digite sua mensagem:");
+    System.out.println("Ola " + nome + " - Para entrar no chat digite 'entrar'");
+    System.out.println();
+    String login = in.nextLine();
 
-		while (true) {
-			String msg = in.nextLine();
+    if (login.equals("entrar")) {
+      System.out.println();
+      System.out.println("Bem vindo ao chat Multicast");
+      System.out.println("Para deixar o chat digite 'sair' ");
+      System.out.println();
+      System.out.println("Digite sua mensagem:");
+      while (true) {
+        String msg = in.nextLine();
 
-			if (msg.equals("sair")) {
-				fim = true;
-				mSocket.leaveGroup(groupIp);
-				mSocket.close();
-				break;
-			}
-			msg = "[" + nome + "]" + ": " + msg;
-			byte[] buffer = new byte[1000];
-			buffer = msg.getBytes();
+        if (msg.equals("sair")) {
+          fim = true;
+          mSocket.leaveGroup(groupIp);
+          mSocket.close();
+          break;
+        }
+        msg = "[" + nome + "]" + ": " + msg;
+        byte[] buffer = new byte[1000];
+        buffer = msg.getBytes();
 
-			DatagramPacket enviaMsg = new DatagramPacket(buffer, buffer.length, groupIp, porta);
-			mSocket.send(enviaMsg);
-		}
-	}
+        DatagramPacket enviaMsg = new DatagramPacket(buffer, buffer.length, groupIp, porta);
+        mSocket.send(enviaMsg);
+      }
 
-	public static void main(String[] args) throws IOException {
-		System.out.println("");
-		System.out.println("CHAT MULTICAST JAVA");
-		System.out.println("");
+    } else {
+      System.out.println("Você saiu do programa");
+      System.exit(0);
+    }
 
-		adicionarUsuario();
+  }
 
-	}
+  public static void main(String[] args) throws IOException {
+    System.out.println("");
+    System.out.println("CHAT MULTICAST JAVA");
+    System.out.println("");
+
+    adicionarUsuario();
+
+  }
 }
 
 class ExecutaThread implements Runnable {
 
-	MulticastSocket mSocket;
-	InetAddress gropoIp;
-	int porta;
-	
-	public ExecutaThread(MulticastSocket mSocket, InetAddress gropoIp, int porta) {
-		super();
-		this.mSocket = mSocket;
-		this.gropoIp = gropoIp;
-		this.porta = porta;
-	} 
-	
-	@Override
-	public void run () {
-		while (!ChatMulticast.fim) {
-			byte [] buffer = new byte[1000];
-			DatagramPacket recebeMsg = new DatagramPacket (buffer, buffer.length);
-			try {
-				mSocket.receive(recebeMsg);
-				String msgGrupo = new String(recebeMsg.getData());
-				System.out.println(msgGrupo);
-			} catch (IOException e) {
-				System.out.println("Voce saiu do chat.");
-			}
-		}
-	}
-	
+  MulticastSocket mSocket;
+  InetAddress gropoIp;
+  int porta;
+
+  public ExecutaThread(MulticastSocket mSocket, InetAddress gropoIp, int porta) {
+    super();
+    this.mSocket = mSocket;
+    this.gropoIp = gropoIp;
+    this.porta = porta;
+  }
+
+  @Override
+  public void run() {
+    while (!ChatMulticast.fim) {
+      byte[] buffer = new byte[1000];
+      DatagramPacket recebeMsg = new DatagramPacket(buffer, buffer.length);
+      try {
+        mSocket.receive(recebeMsg);
+        String msgGrupo = new String(recebeMsg.getData());
+        System.out.println(msgGrupo);
+      } catch (IOException e) {
+        System.out.println("Voce saiu do chat.");
+      }
+    }
+  }
+
 }
