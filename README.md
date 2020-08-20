@@ -13,7 +13,7 @@ Este trabalho tem por objetivo praticar os programação em redes utilizando soc
 
 ## Funcionamento do Sistema
 Ao executar o programa, o usuário deve fornecer seu nome.
-Para entrar no chat o usuário deve digitar a palavra "entrar" e ele será a um ip e uma porta pré-estabelecida configurada nas variáveis globais do programa.
+Para entrar no chat o usuário deve digitar a palavra "entrar" e ele será direcionado a um ip e uma porta pré-estabelecida configurada nas variáveis globais do programa.
 Para sair da sala, o usuário deve digitar o comando "sair" para deixar o chat.
 
 ## Aluno
